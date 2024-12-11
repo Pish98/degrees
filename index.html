@@ -56,7 +56,7 @@
     app.expand();
 
     if (initData) {
-    	const ws = new WebSocket("wss://dedata.degrees.tg/ws");
+    	const ws = new WebSocket("ws://dedata.degrees.tg/ws");
     
     	ws.onopen = () => {
     		ws.send(JSON.stringify({type: "init_data", data: initData}));
