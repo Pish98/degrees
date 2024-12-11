@@ -88,10 +88,10 @@
     			if (data.type === "daily_points") {
             const users = data.payload;
 
-            const elements = [...users, ...users, ...users, ...users, ...users, ...users].map(u => `
+            const elements = users.map(user => `
               <div class="user">
-                <span class="name">${u.user_nick.replaceAll("<", "&lt;").replaceAll(">", "&gt;")}${u.has_nft ? "°" : ""}</span>
-                <span class="score">${u.daily_points}°</span>
+                <span class="name">${user.user_nick.replaceAll("<", "&lt;").replaceAll(">", "&gt;")}${user.has_nft ? "°" : ""}</span>
+                <span class="score">${user.daily_points}°</span>
               </div>
             `);
 
@@ -105,6 +105,8 @@
     	};
     
     	ws.onclose = () => console.log("Closed");
+    } else {
+      leaderboard.innerHTML = "Open webview in Telegram";
     }
   </script>
 </body>
