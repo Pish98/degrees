@@ -9,13 +9,103 @@
   <meta name="google" content="notranslate">
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <title>Главная страница</title>
+  <style>
+    html, body {
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      background-color: black;
+      color: white;
+      overflow: hidden;
+    }
+    .leaderboard {
+      height: 400px;
+      overflow: scroll;
+      padding: 20px 45px 170px 33px;
+    }
+    .user {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      font-family: Gost_A;
+      font-size: 22px;
+      line-height: 30px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      font-family: Gost_A;
+      font-size: 22px;
+      padding: 20px 65px 10px 53px;
+      line-height: 30px;
+      background-color: black;
+    }
+  </style>
 </head>
 <body>
+  <div class="header"></div>
+  <div class="leaderboard"></div>
   <script>
-    const app = window.Telegram.WebApp;
+    const leaderboard = document.querySelector(".leaderboard");
+    const header = document.querySelector(".header");
+
+    const app = window.Telegram?.WebApp;
+    const initData = app.initData;
 
     app.ready();
     app.expand();
+
+    if (initData) {
+    	const ws = new WebSocket("wss://dedata.degrees.tg/ws");
+    
+    	ws.onopen = () => {
+    		ws.send(JSON.stringify({type: "init_data", data: initData}));
+        ws.send(JSON.stringify({event_type: "get_user_info", payload: {}}));
+    		ws.send(JSON.stringify({event_type: "get_daily_points", payload: {}})); 
+    	};
+    	
+    	ws.onmessage = message => {
+    		try {
+    			const data = JSON.parse(message.data);
+    
+    			if (data.type === "auth_error") {
+    				leaderboard.innerHTML = "Authorization error";
+    			}
+
+          if (data.type === "session_expired_error") {
+            leaderboard.innerHTML = "Session expired error";
+          }
+
+          if (data.type === "user_info") {
+            const user = data.payload;
+
+            header.innerHTML = `
+              <span class="name">${user.user_nick.replaceAll("<", "&lt;").replaceAll(">", "&gt;")}${user.has_nft ? "°" : ""}</span>
+              <span class="score">${user.daily_points}°</span>
+            `;
+          }
+    
+    			if (data.type === "daily_points") {
+            const users = data.payload;
+
+            const elements = [...users, ...users, ...users, ...users, ...users, ...users].map(u => `
+              <div class="user">
+                <span class="name">${u.user_nick.replaceAll("<", "&lt;").replaceAll(">", "&gt;")}${u.has_nft ? "°" : ""}</span>
+                <span class="score">${u.daily_points}°</span>
+              </div>
+            `);
+
+            leaderboard.innerHTML += elements.join("");
+    			}
+
+          console.log(data);
+    		} catch (err) {
+          console.error(err);
+        }
+    	};
+    
+    	ws.onclose = () => console.log("Closed");
+    }
   </script>
 </body>
 </html>
