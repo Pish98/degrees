@@ -10,6 +10,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <title>Главная страница</title>
   <style>
+   @font-face {
+     font-family:Gost_A;
+     src:url(GOST_A.TTF) format("truetype");
+     -webkit-font-smoothing:antialiased;
+     -moz-osx-font-smoothing:grayscale;
+     text-rendering:optimizeLegibility
+   }
     html, body {
       width: 100%;
       padding: 0;
@@ -17,6 +24,7 @@
       background-color: black;
       color: white;
       overflow: hidden;
+      font-family: Gost_A;
     }
     .leaderboard {
       height: 400px;
@@ -34,7 +42,6 @@
     .header {
       display: flex;
       justify-content: space-between;
-      font-family: Gost_A;
       font-size: 22px;
       padding: 20px 65px 10px 53px;
       line-height: 30px;
